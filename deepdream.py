@@ -207,107 +207,12 @@ def render_deepdream(t_obj, img0=img_noise,
             img += g*(step / (np.abs(g).mean()+1e-7))
             print('.',end = ' ')
         clear_output()
-        filename = filename.split('.')
-        filename = filename[0] + '_o_{}.jpg'.format(octave)
-        showarray(img/255.0, filename=filename)
+    showarray(img/255.0, filename=filename)
 
-
-def generate_layernames():    
-    import pandas as pd
-    d = {'layers' : layers, "features" : feature_nums}
-    ldf = pd.DataFrame(data=d)
-    ldf.to_csv('layer.csv')
-    print(ldf.head())
-
-def generate_rand_linear_lapnorm():
-    count = np.random.choice([1,2,3])
-
-    # tensor to be optimized
-    t = None
-
-    layer_idx = np.random.randint(0, len(layers))
-
-    features_idx = []
-    features_str = ''
-
-    for i in range(count):
-        features_idx.append(np.random.randint(0, feature_nums[layer_idx]))
-
-    features_idx.sort()
-
-    layer = layers[layer_idx]
-    layer = layer.split('/')[1]
     
-    for i in range(count):
-        feature_idx = features_idx[i]
-
-        features_str += '{}'.format(feature_idx)
-        if(i<count-1):
-            features_str+=','
-
-        if(i == 0):
-            t = T(layer)[:,:,:,feature_idx]
-        else:
-            t += T(layer)[:,:,:,feature_idx]
-
-        print("Mixing ||{}|| Layer {} :: {} :: feature : {}".format(i, layer_idx, layer, feature_idx))
-
-    filename = 'dreamTemple/l_{}_f_{}.jpg'.format(layer_idx, features_str)
-
-    if os.path.isfile(filename):
-        "Skipping as it already exists"
-        return
-
-    render_lapnorm(t , fileToSave=filename, octave_n=4)
-    print("Saved to {}".format(filename))    
-    
-
-def generate_rand_dream(img=img_noise):
-    count = np.random.choice([1,2,3])
-
-    # tensor to be optimized
-    t = None
-
-    layer_idx = np.random.randint(0, len(layers))
-
-    features_idx = []
-    features_str = ''
-
-    for i in range(count):
-        features_idx.append(np.random.randint(0, feature_nums[layer_idx]))
-
-    features_idx.sort()
-
-    layer = layers[layer_idx]
-    layer = layer.split('/')[1]
-    
-    for i in range(count):
-        feature_idx = features_idx[i]
-
-        features_str += '{}'.format(feature_idx)
-        if(i<count-1):
-            features_str+=','
-
-        if(i == 0):
-            t = T(layer)[:,:,:,feature_idx]
-        else:
-            t += T(layer)[:,:,:,feature_idx]
-
-        print("Mixing ||{}|| Layer {} :: {} :: feature : {}".format(i, layer_idx, layer, feature_idx))
-
-    filename = 'dreamTemple/l_{}_f_{}.jpg'.format(layer_idx, features_str)
-
-    if os.path.isfile(filename):
-        "Skipping as it already exists"
-        return
-
-    render_lapnorm(t , fileToSave=filename, octave_n=4)
-    print("Saved to {}".format(filename))    
-    
-
-for i in range(50):
-    # generate_rand_lapnorm()
-    generate_rand_linear_lapnorm()
+# for i in range(50):
+#     # generate_rand_lapnorm()
+#     generate_rand_linear_lapnorm()
 
 
 # render_lapnorm(T(layer)[:,:,:,channel], fileToSave='testOutput.jpg')
