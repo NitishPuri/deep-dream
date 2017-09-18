@@ -56,11 +56,15 @@ def generate_rand_linear_lapnorm():
 
 
 
-reg = r'^\.\.\/test_data[\/\\](?P<q>.*)[\/\\](?P<file>.*)\.jpg$'
+reg = r'^.*[\/\\](?P<q>.*)[\/\\](?P<file>.*)\.jpg$'
 
 OUTPUT_IMAGES = 'output/dreams/{d}/{f}.jpg'
 
 def generate_rand_dream(file):
+
+    if os.path.isfile(file) is False:
+        print("Skipping,  {} deleted".format(file))
+        return
 
     image = PIL.Image.open(file)
     image = np.float32(image)
@@ -102,18 +106,20 @@ def generate_rand_dream(file):
         print("Mixing ||{}|| Layer {} :: {} :: feature : {}".format(i, layer_idx, layer, feature_idx))
 
     
-    fileName = '{}_l_{}_f_{}'.format(fileName, layer_idx, features_str)
-    fileName = OUTPUT_IMAGES.strip().format(d=dirName, f=fileName)
-
     pattern = '{}_l_{}_f_*'.format(fileName, layer_idx, features_str)
     pattern = OUTPUT_IMAGES.strip().format(d=dirName, f=pattern)
+
+    fileName = '{}_l_{}_f_{}'.format(fileName, layer_idx, features_str)
+    fileName = OUTPUT_IMAGES.strip().format(d=dirName, f=fileName)
 
     if len(glob.glob(pattern)) > 0:
         "Skipping as '{}' already exists".format(pattern)
         return
 
-    render_deepdream(t , image, iter_n=15,  filename=fileName, octave_n=8)
+    render_deepdream(t , image, iter_n=30,  filename=fileName, octave_n=8)
     print("Saved to {}".format(fileName))    
+
+    return fileName
 
 
 # for i in range(5):
@@ -122,15 +128,22 @@ def generate_rand_dream(file):
 
 
 
-INPUT_IMAGES = '../test_data/*/*.jpg'
+INPUT_IMAGES = '../test_data2/*/*.jpg'
 images = glob.glob(INPUT_IMAGES)
 
-images = np.random.choice(images, 10)
+# images = np.random.choice(images, 10)
 
-for file in images:
-    print("Generating dreams for : {}".format(file))
-    for i in range(10):
-        generate_rand_dream(file)
+while True:
+    image = np.random.choice(images)
+    print("Generating dreams for : {}".format(image))
+
+    image2 = generate_rand_dream(image)
+    image3 = generate_rand_dream(image2)
+
+# for file in images:
+#     print("Generating dreams for : {}".format(file))
+#     for i in range(2):
+#         generate_rand_dream(file)
 
 
 
